@@ -1,0 +1,1044 @@
+<?php
+/**
+ * MehediSaniX Cyber Security Portfolio
+ * Author: Mehedi Hasan Sani
+ * Host: InfinityFree / freedev.app
+ */
+
+// ---------- Security Headers ----------
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+
+// ---------- Page Config ----------
+$site_name   = "MehediSaniX";
+$site_title  = "MehediSaniX | Cyber Security BD";
+$site_desc   = "Mehedi Hasan Sani — Termux Expert, Cyber Security Specialist, Bot Developer, Kali Linux. হ্যাকিং একটি শিল্প।";
+$site_url    = "https://CobraExpire.freedev.app/";
+$profile_img = "https://i.ibb.co/BHHgyZ8Z/1000018975.png";
+
+// ---------- Detect Current Year for footer (optional) ----------
+$year = date("Y");
+?>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- SEO -->
+    <title><?= htmlspecialchars($site_title) ?></title>
+    <meta name="description" content="<?= htmlspecialchars($site_desc) ?>">
+    <meta name="author" content="Mehedi Hasan Sani">
+    <meta name="keywords" content="MehediSaniX, Cyber Security BD, Termux, Kali Linux, Hacker, Bot Developer, Bangladesh">
+    <meta name="theme-color" content="#06060e">
+
+    <!-- Open Graph (Facebook / Telegram share) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<?= htmlspecialchars($site_title) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($site_desc) ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($profile_img) ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($site_url) ?>">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($site_title) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($site_desc) ?>">
+    <meta name="twitter:image" content="<?= htmlspecialchars($profile_img) ?>">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="<?= htmlspecialchars($profile_img) ?>">
+    <link rel="apple-touch-icon" href="<?= htmlspecialchars($profile_img) ?>">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --neon-pink: #ff2d95;
+            --neon-blue: #00d4ff;
+            --neon-purple: #b829ff;
+            --neon-orange: #ff6b35;
+            --neon-green: #00ff88;
+            --neon-yellow: #ffd700;
+            --neon-red: #ff0000;
+            --dark-bg: #06060e;
+            --panel-bg: rgba(10, 8, 20, 0.85);
+            --glass: rgba(15, 12, 30, 0.7);
+            --border-glow: rgba(0, 212, 255, 0.4);
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Rajdhani', 'Hind Siliguri', sans-serif;
+            overflow-x: hidden;
+            cursor: crosshair;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-height: 100vh;
+            transition: background 0.5s, filter 0.5s, transform 0.5s;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(0, 212, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(255, 45, 149, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(184, 41, 255, 0.03) 0%, transparent 50%);
+        }
+
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; transition: filter 0.5s; }
+        #lightning-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
+
+        /* Terminal Popup */
+        .terminal-popup {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+            z-index: 99995; background: #000;
+            border: 3px solid #00ff88; border-radius: 15px;
+            width: 92%; max-width: 520px; max-height: 75vh; overflow-y: auto;
+            padding: 20px; font-family: 'Fira Code', monospace;
+            font-size: 0.7rem; color: #00ff88;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 80px rgba(0, 255, 136, 0.7);
+        }
+        .terminal-popup.open { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        .terminal-popup .term-close {
+            position: sticky; top: 0; float: right;
+            background: #ff2d55; border: none; color: #fff;
+            padding: 10px 18px; border-radius: 10px; cursor: pointer;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem; z-index: 10;
+        }
+        .terminal-popup .term-header {
+            font-family: 'Orbitron', sans-serif; font-size: 0.85rem;
+            margin-bottom: 15px; letter-spacing: 2px;
+            border-bottom: 2px solid #333; padding-bottom: 10px;
+        }
+
+        /* Page Overlay */
+        .page-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 99990;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; pointer-events: none;
+        }
+        .page-overlay.active { display: flex; pointer-events: all; }
+
+        #matrixCanvas {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 99991;
+            pointer-events: none; display: none;
+        }
+        #matrixCanvas.active { display: block; }
+
+        .glitch-distort {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 99992;
+            pointer-events: none; display: none;
+            background: repeating-linear-gradient(0deg, rgba(255, 0, 50, 0.08) 0px, rgba(0, 100, 255, 0.08) 3px, transparent 3px, transparent 6px);
+            animation: glitchShake 0.08s infinite;
+        }
+        .glitch-distort.active { display: block; }
+        @keyframes glitchShake {
+            0% { transform: translate(3px, -2px); }
+            25% { transform: translate(-4px, 3px); }
+            50% { transform: translate(1px, -3px); }
+            75% { transform: translate(-3px, -1px); }
+            100% { transform: translate(2px, 2px); }
+        }
+
+        .nuke-explosion {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 99993; pointer-events: none;
+            width: 0; height: 0; border-radius: 50%;
+            background: radial-gradient(circle, #fff 0%, #ff0 20%, #f80 40%, #f00 70%, transparent 100%);
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+        }
+        .nuke-explosion.active {
+            width: 200vmax; height: 200vmax;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0; transition: all 1.2s ease-out;
+        }
+
+        .earthquake { animation: shake 0.3s infinite; }
+        @keyframes shake {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-8px, 5px); }
+            50% { transform: translate(6px, -7px); }
+            75% { transform: translate(-5px, -3px); }
+        }
+
+        .certificate-flip {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) perspective(600px) rotateY(180deg);
+            z-index: 99995;
+            background: linear-gradient(135deg, #1a1a00, #0a0a00);
+            border: 10px double #ffd700; border-radius: 15px;
+            width: 90%; max-width: 450px; padding: 35px 25px;
+            text-align: center; font-family: 'Orbitron', sans-serif;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 100px rgba(255, 215, 0, 0.6), inset 0 0 50px rgba(255, 215, 0, 0.1);
+            backface-visibility: hidden;
+        }
+        .certificate-flip.open { transform: translate(-50%, -50%) perspective(600px) rotateY(0deg); }
+        .certificate-flip .cert-seal { font-size: 5rem; animation: spinSlow 4s linear infinite; }
+        @keyframes spinSlow { 100% { transform: rotate(360deg); } }
+        .certificate-flip .cert-title {
+            font-size: 1.6rem; color: #ffd700; letter-spacing: 5px;
+            margin: 12px 0; text-shadow: 0 0 30px #ffd700;
+        }
+        .certificate-flip .cert-close {
+            background: #ffd700; border: none; color: #000;
+            padding: 12px 30px; border-radius: 25px; cursor: pointer;
+            font-weight: 700; margin-top: 15px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
+        }
+
+        .radar-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 99990;
+            pointer-events: none; display: none;
+            background: rgba(0, 0, 0, 0.85);
+        }
+        .radar-overlay.active { display: block; }
+        #radarCanvas { width: 100%; height: 100%; }
+
+        .flood-overlay {
+            position: fixed; top: 0; left: 0;
+            width: 100vw; height: 100vh; z-index: 99990;
+            pointer-events: none; display: none;
+        }
+        .flood-overlay.active { display: block; }
+        .flood-packet {
+            position: absolute; font-family: 'Fira Code', monospace;
+            font-size: 0.6rem; color: #ff2d55;
+            animation: packetFall linear forwards; pointer-events: none;
+        }
+        @keyframes packetFall {
+            0% { transform: translateY(-100px); opacity: 1; }
+            100% { transform: translateY(105vh); opacity: 0; }
+        }
+
+        .mobile-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            z-index: 10000; background: rgba(5, 5, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 2px solid var(--border-glow);
+            display: flex; justify-content: space-around;
+            padding: 10px 5px 15px; gap: 2px;
+        }
+        .mobile-nav button {
+            background: transparent; border: none; color: #777;
+            font-size: 0.55rem; display: flex; flex-direction: column;
+            align-items: center; gap: 4px; cursor: pointer;
+            transition: 0.3s; padding: 8px 10px; border-radius: 12px;
+            font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;
+        }
+        .mobile-nav button i { font-size: 1.2rem; }
+        .mobile-nav button:active { color: var(--neon-blue); text-shadow: 0 0 15px var(--neon-blue); }
+
+        .main-container {
+            width: 100%; max-width: 700px; margin: 0 auto;
+            padding: 10px 12px 130px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .status-bar {
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 8px;
+            padding: 10px 15px; background: var(--glass);
+            border-radius: 20px; border: 1px solid var(--border-glow);
+            backdrop-filter: blur(10px); font-size: 0.7rem; letter-spacing: 1px;
+        }
+        .status-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 1.5s infinite; }
+        .status-dot.green { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+        .status-dot.blue { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .profile-card {
+            display: flex; align-items: center; gap: 20px;
+            padding: 25px 20px; background: var(--panel-bg);
+            border-radius: 25px; border: 1px solid var(--border-glow);
+            backdrop-filter: blur(15px); position: relative; overflow: hidden;
+        }
+        .profile-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.1), transparent, rgba(255, 45, 149, 0.1), transparent);
+            animation: rotateBg 6s linear infinite;
+        }
+        @keyframes rotateBg { 100% { transform: rotate(360deg); } }
+        .profile-img-wrap { position: relative; z-index: 2; flex-shrink: 0; }
+        .profile-img {
+            width: 100px; height: 100px; border-radius: 20px;
+            object-fit: cover; border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), 0 0 60px rgba(255, 45, 149, 0.3);
+            transition: 0.4s;
+        }
+        .profile-img:active {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px rgba(255, 45, 149, 0.8), 0 0 100px rgba(0, 212, 255, 0.6);
+        }
+        .profile-info { z-index: 2; }
+        .profile-info h2 {
+            font-family: 'Orbitron', sans-serif; font-size: 1.4rem;
+            font-weight: 800; letter-spacing: 2px; color: #fff;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+        .profile-info .tag {
+            font-size: 0.7rem; color: var(--neon-pink);
+            letter-spacing: 2px; font-weight: 600;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif; font-size: 0.9rem;
+            font-weight: 700; letter-spacing: 3px; color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            display: flex; align-items: center; gap: 8px; padding: 5px 0;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .glass-panel {
+            background: var(--glass); border: 1px solid var(--border-glow);
+            border-radius: 20px; padding: 18px; backdrop-filter: blur(12px);
+        }
+
+        .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .skill-chip {
+            display: flex; align-items: center; gap: 8px;
+            padding: 14px 12px; border-radius: 15px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            font-size: 0.75rem; font-weight: 600;
+            transition: 0.3s; cursor: pointer;
+        }
+        .skill-chip:active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--neon-blue); transform: scale(0.95);
+        }
+        .skill-chip i { color: var(--neon-blue); font-size: 1.2rem; }
+        .skill-chip .level {
+            margin-left: auto; background: var(--neon-purple);
+            color: #fff; font-size: 0.55rem; padding: 3px 8px;
+            border-radius: 8px; font-weight: 700;
+        }
+
+        .fun-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .fun-btn {
+            padding: 18px 12px; border-radius: 18px; border: 2px solid;
+            font-family: 'Orbitron', sans-serif; font-size: 0.65rem;
+            font-weight: 700; letter-spacing: 1px; cursor: pointer;
+            transition: 0.3s; text-align: center;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 8px;
+            background: transparent; color: #fff;
+            position: relative; overflow: hidden;
+        }
+        .fun-btn i { font-size: 1.8rem; position: relative; z-index: 2; }
+        .fun-btn span { position: relative; z-index: 2; }
+        .fun-btn:active { transform: scale(0.88); }
+        .fun-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s;
+        }
+        .fun-btn:active::after { left: 100%; }
+
+        .btn-hack { border-color: #ff2d55; color: #ff2d55; animation: glowPulse #ff2d55 1.5s infinite; }
+        .btn-crack { border-color: #ff6b35; color: #ff6b35; animation: glowPulse #ff6b35 1.5s infinite; }
+        .btn-nuke { border-color: #ff0000; color: #ff0000; animation: glowPulse #ff0000 0.7s infinite; }
+        .btn-encrypt { border-color: #00ff88; color: #00ff88; animation: glowPulse #00ff88 1.5s infinite; }
+        .btn-spy { border-color: #b829ff; color: #b829ff; animation: glowPulse #b829ff 1.5s infinite; }
+        .btn-scan { border-color: #00d4ff; color: #00d4ff; animation: glowPulse #00d4ff 1.5s infinite; }
+        .btn-cert { border-color: #ffd700; color: #ffd700; animation: glowPulse #ffd700 1.5s infinite; }
+        .btn-matrix { border-color: #00ff41; color: #00ff41; animation: glowPulse #00ff41 1s infinite; }
+        .btn-ddos { border-color: #ff4500; color: #ff4500; animation: glowPulse #ff4500 0.9s infinite; }
+        .btn-wifi { border-color: #1e90ff; color: #1e90ff; animation: glowPulse #1e90ff 1.3s infinite; }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 5px currentColor; }
+            50% { box-shadow: 0 0 30px currentColor, 0 0 60px currentColor; }
+        }
+
+        .live-log {
+            background: #020208; border: 2px solid #1a1a3a;
+            border-radius: 15px; padding: 15px;
+            font-family: 'Fira Code', monospace; font-size: 0.65rem;
+            line-height: 1.6; color: #00ff88;
+            max-height: 200px; overflow-y: auto;
+            scrollbar-width: thin; scrollbar-color: #00ff88 #000;
+        }
+        .live-log .log-entry {
+            padding: 3px 0; border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .log-time { color: #ff6b35; margin-right: 8px; }
+        .log-warn { color: #ff2d55; }
+        .log-info { color: #00d4ff; }
+        .log-success { color: #00ff88; }
+
+        .track-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .track-card {
+            background: rgba(10, 8, 20, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px; padding: 15px; text-align: center;
+            transition: 0.3s;
+        }
+        .track-card:active {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 45, 149, 0.3);
+        }
+        .track-card .track-icon { font-size: 1.8rem; margin-bottom: 5px; }
+        .track-card .track-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem; font-weight: 700; color: var(--neon-blue);
+        }
+        .track-card .track-label {
+            font-size: 0.6rem; color: #888; letter-spacing: 1px; margin-top: 3px;
+        }
+
+        .contact-grid { display: flex; flex-direction: column; gap: 8px; }
+        .contact-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 18px; border-radius: 50px;
+            text-decoration: none; font-weight: 700;
+            font-size: 0.85rem; letter-spacing: 1px;
+            transition: 0.3s; border: 2px solid; background: transparent;
+        }
+        .contact-btn:active { transform: scale(0.95); }
+        .btn-tg { border-color: #0088cc; color: #0088cc; }
+        .btn-ch { border-color: #00d4ff; color: #00d4ff; }
+        .btn-fb { border-color: #1877f2; color: #1877f2; }
+        .btn-bot { border-color: #ff2d55; color: #ff2d55; animation: glowPulse #ff2d55 1.2s infinite; }
+
+        .bangla-block {
+            text-align: center; padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 45, 149, 0.05));
+            border-radius: 20px; border: 1px solid rgba(255, 45, 149, 0.3);
+        }
+        .bangla-block .b-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-size: 1rem; font-weight: 700;
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
+            letter-spacing: 1px;
+        }
+        .bangla-block .b-sub {
+            font-size: 0.7rem; color: #aaa; margin-top: 5px;
+        }
+
+        .toast {
+            position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%); z-index: 99998;
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
+            border-radius: 30px; padding: 10px 25px;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            animation: toastIn 0.3s, toastOut 0.3s 2s forwards;
+            pointer-events: none;
+        }
+        @keyframes toastIn { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; top: -50px; } }
+
+        @media (min-width: 500px) {
+            .skills-grid { grid-template-columns: repeat(3, 1fr); }
+            .fun-buttons { grid-template-columns: repeat(3, 1fr); }
+            .track-grid { grid-template-columns: repeat(4, 1fr); }
+            .profile-img { width: 130px; height: 130px; }
+            .profile-info h2 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="lightning-canvas"></canvas>
+    <audio id="bg-music" loop preload="auto"><source src="https://files.catbox.moe/4yci7u.mp3" type="audio/mpeg"></audio>
+
+    <!-- Terminal Popup -->
+    <div class="terminal-popup" id="terminalPopup">
+        <button class="term-close" onclick="closeTerminal()">✕ CLOSE</button>
+        <div class="term-header" id="termHeader">TERMINAL</div>
+        <div id="termContent" style="line-height:1.8;"></div>
+    </div>
+
+    <div class="nuke-explosion" id="nukeExplosion"></div>
+    <div class="glitch-distort" id="glitchDistort"></div>
+    <canvas id="matrixCanvas"></canvas>
+
+    <div class="radar-overlay" id="radarOverlay">
+        <canvas id="radarCanvas"></canvas>
+    </div>
+
+    <div class="flood-overlay" id="floodOverlay"></div>
+
+    <div class="certificate-flip" id="certificateFlip">
+        <div class="cert-seal">⌬</div>
+        <div class="cert-title">CERTIFIED HACKER</div>
+        <p style="color:#ffd700;font-size:0.85rem;letter-spacing:3px;">MehediSaniX</p>
+        <p style="color:#ccc;font-size:0.7rem;">Cyber Security Expert</p>
+        <p style="color:#999;font-size:0.6rem;">MehediSaniX Cyber security</p>
+        <p style="color:#ffd700;font-size:0.55rem;margin-top:8px;">ID: BHX-<?= $year ?>-CERT</p>
+        <button class="cert-close" onclick="closeCertificate()">CLOSE</button>
+    </div>
+
+    <!-- Main -->
+    <div class="main-container">
+        <div class="status-bar">
+            <div class="status-item"><span class="status-dot green"></span> ONLINE</div>
+            <div class="status-item" id="liveClock">00:00:00</div>
+            <div class="status-item"><span class="status-dot blue"></span> BD TIME</div>
+            <div class="status-item">🔒 SECURED</div>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-img-wrap">
+                <img src="<?= htmlspecialchars($profile_img) ?>" alt="MehediSanix" class="profile-img">
+            </div>
+            <div class="profile-info">
+                <h2>MehediSanix</h2>
+                <p class="tag">⚡ Mehedi Hasan Sani | DARK OPS ⚡</p>
+                <p style="font-size:0.7rem;color:#aaa;margin-top:5px;">🦅 MehediSanix Cyber security</p>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-crosshairs"></i> COMBAT SKILLS</div>
+        <div class="glass-panel">
+            <div class="skills-grid">
+                <div class="skill-chip"><i class="fas fa-terminal"></i> Termux <span class="level">X</span></div>
+                <div class="skill-chip"><i class="fas fa-shield-virus"></i> Cyber Expert <span class="level">X</span></div>
+                <div class="skill-chip"><i class="fas fa-ghost"></i> Dark Web</div>
+                <div class="skill-chip"><i class="fas fa-code"></i> Web Dev</div>
+                <div class="skill-chip"><i class="fas fa-mobile-alt"></i> App Dev</div>
+                <div class="skill-chip"><i class="fab fa-linux"></i> Kali Linux</div>
+                <div class="skill-chip"><i class="fas fa-database"></i> Database</div>
+                <div class="skill-chip"><i class="fas fa-robot"></i> Bot Master</div>
+                <div class="skill-chip"><i class="fas fa-network-wired"></i> Network</div>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-gamepad"></i> CYBER TOOLS (ALL UNIQUE)</div>
+        <div class="glass-panel">
+            <div class="fun-buttons">
+                <button class="fun-btn btn-hack" onclick="triggerHack()"><i class="fas fa-skull"></i><span>HACK SYSTEM</span></button>
+                <button class="fun-btn btn-crack" onclick="triggerCrack()"><i class="fas fa-key"></i><span>CRACK PASS</span></button>
+                <button class="fun-btn btn-nuke" onclick="triggerNuke()"><i class="fas fa-radiation"></i><span>NUKE MODE</span></button>
+                <button class="fun-btn btn-encrypt" onclick="triggerEncrypt()"><i class="fas fa-lock"></i><span>ENCRYPT</span></button>
+                <button class="fun-btn btn-spy" onclick="triggerSpy()"><i class="fas fa-eye"></i><span>SPY CAM</span></button>
+                <button class="fun-btn btn-scan" onclick="triggerScan()"><i class="fas fa-search"></i><span>RADAR SCAN</span></button>
+                <button class="fun-btn btn-cert" onclick="triggerCertificate()"><i class="fas fa-medal"></i><span>CERTIFICATE</span></button>
+                <button class="fun-btn btn-matrix" onclick="triggerMatrix()"><i class="fas fa-meteor"></i><span>MATRIX RAIN</span></button>
+                <button class="fun-btn btn-ddos" onclick="triggerDDoS()"><i class="fas fa-bomb"></i><span>DDoS ATTACK</span></button>
+                <button class="fun-btn btn-wifi" onclick="triggerWiFi()"><i class="fas fa-wifi"></i><span>WiFi HACK</span></button>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-stream"></i> LIVE SYSTEM LOG</div>
+        <div class="live-log" id="liveLog">
+            <div class="log-entry"><span class="log-time">[00:00]</span> <span class="log-success">✓ System initialized</span></div>
+            <div class="log-entry"><span class="log-time">[00:01]</span> <span class="log-info">ℹ Firewall active</span></div>
+            <div class="log-entry"><span class="log-time">[00:02]</span> <span class="log-success">✓ All systems nominal</span></div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-radar"></i> LIVE TRACKING</div>
+        <div class="glass-panel">
+            <div class="track-grid">
+                <div class="track-card"><div class="track-icon">❂</div><div class="track-val" id="trackIP">--</div><div class="track-label">IP ADDRESS</div></div>
+                <div class="track-card"><div class="track-icon">⍒</div><div class="track-val" id="trackLoc">--</div><div class="track-label">LOCATION</div></div>
+                <div class="track-card"><div class="track-icon">⎋</div><div class="track-val" id="trackISP">--</div><div class="track-label">ISP</div></div>
+                <div class="track-card"><div class="track-icon">⎚</div><div class="track-val" id="trackBrowser">--</div><div class="track-label">BROWSER</div></div>
+                <div class="track-card"><div class="track-icon">⌬</div><div class="track-val" id="trackUptime">00:00</div><div class="track-label">SESSION</div></div>
+                <div class="track-card"><div class="track-icon">⎙</div><div class="track-val" id="trackVisits">--</div><div class="track-label">VISITORS</div></div>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-satellite-dish"></i> SECURE CHANNELS</div>
+        <div class="glass-panel">
+            <div class="contact-grid">
+                <a href="https://t.me/MehediSanix" target="_blank" class="contact-btn btn-tg"><i class="fab fa-telegram-plane"></i> Personal Telegram</a>
+                <a href="https://t.me/+3EgVgBig73I1MzNl" target="_blank" class="contact-btn btn-ch"><i class="fas fa-broadcast-tower"></i> Telegram Channel</a>
+                <a href="https://www.facebook.com/share/1F7fXTF4iA/" target="_blank" class="contact-btn btn-fb"><i class="fab fa-facebook-f"></i> Facebook Page</a>
+                <a href="https://t.me/BlackBoX_CobraExpire_Bot" target="_blank" class="contact-btn btn-bot"><i class="fas fa-skull-crossbones"></i> FREE TOOLS BOT</a>
+            </div>
+        </div>
+
+        <div class="bangla-block">
+            <div class="b-text">হ্যাকিং কোন অপরাধ নয়, হ্যাকিং একটি শিল্প</div>
+            <div class="b-sub">আমি সেই শিল্পের কারিগর | MehediSaniX</div>
+        </div>
+
+        <div class="glass-panel">
+            <div class="section-title" style="margin-bottom:10px;"><i class="fas fa-file-contract"></i> CLASSIFIED</div>
+            <div style="font-family:'Fira Code',monospace;font-size:0.7rem;line-height:1.8;color:#b0ffb0;">
+                <p>&gt; Agent: <span style="color:#00d4ff;">Mehedi Hasan Sani</span></p>
+                <p>&gt; Crew: <span style="color:#ff2d55;">MehediSanix Cyber security</span></p>
+                <p>&gt; Status: <span style="color:#ffd700;">UNSTOPPABLE</span></p>
+                <p>&gt; Country: <span style="color:#00ff88;">DHAKA BANGLADESH</span></p>
+            </div>
+        </div>
+
+        <div style="text-align:center;font-size:0.65rem;color:#555;padding:10px;">
+            © <?= $year ?> MehediSaniX — All Rights Reserved
+        </div>
+    </div>
+
+    <nav class="mobile-nav">
+        <button onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-home"></i>HOME</button>
+        <button onclick="triggerHack()"><i class="fas fa-skull"></i>HACK</button>
+        <button onclick="triggerNuke()"><i class="fas fa-bomb"></i>NUKE</button>
+        <button onclick="triggerMatrix()"><i class="fas fa-meteor"></i>MATRIX</button>
+        <button onclick="triggerCertificate()"><i class="fas fa-medal"></i>CERT</button>
+        <button onclick="triggerWiFi()"><i class="fas fa-wifi"></i>WiFi</button>
+    </nav>
+
+    <script>
+        // ============ 3D BACKGROUND ============
+        (function() {
+            const canvas = document.getElementById('bg-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 6.5;
+            const count = 5000;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            const col = new Float32Array(count * 3);
+            const c1 = new THREE.Color(0x00d4ff),
+                c2 = new THREE.Color(0xff2d95),
+                c3 = new THREE.Color(0xb829ff),
+                c4 = new THREE.Color(0xffd700);
+            for (let i = 0; i < count * 3; i += 3) {
+                const r = 7.5 * Math.cbrt(Math.random());
+                const th = Math.random() * Math.PI * 2;
+                const ph = Math.acos(2 * Math.random() - 1);
+                pos[i] = Math.sin(ph) * Math.cos(th) * r;
+                pos[i + 1] = Math.sin(ph) * Math.sin(th) * r * 0.6;
+                pos[i + 2] = Math.cos(ph) * r * 0.7;
+                const mix = Math.random();
+                let c;
+                if (mix < 0.35) c = c1.clone().lerp(c3, Math.random());
+                else if (mix < 0.65) c = c2.clone().lerp(c4, Math.random());
+                else c = c3.clone().lerp(c1, Math.random());
+                col[i] = c.r; col[i + 1] = c.g; col[i + 2] = c.b;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+            const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.045, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.8 }));
+            scene.add(pts);
+            const ringGeo = new THREE.TorusGeometry(3, 0.015, 16, 100);
+            const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.25 }));
+            ring.rotation.x = Math.PI / 3;
+            scene.add(ring);
+            const ring2 = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xff2d95, transparent: true, opacity: 0.25 }));
+            ring2.rotation.x = -Math.PI / 3;
+            ring2.rotation.y = 0.7;
+            scene.add(ring2);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                pts.rotation.y += 0.0005;
+                pts.rotation.x += 0.0002;
+                ring.rotation.z += 0.0008;
+                ring2.rotation.z -= 0.0006;
+                renderer.render(scene, camera);
+            }
+            animate();
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+
+        // ============ LIGHTNING ============
+        const lc = document.getElementById('lightning-canvas');
+        const lctx = lc.getContext('2d');
+        lc.width = window.innerWidth;
+        lc.height = window.innerHeight;
+
+        function spark(x, y) {
+            lctx.clearRect(0, 0, lc.width, lc.height);
+            for (let j = 0; j < 10; j++) {
+                lctx.beginPath();
+                const colors = ['#00d4ff', '#ff2d95', '#b829ff', '#ffd700', '#00ff88'];
+                lctx.strokeStyle = colors[j % colors.length];
+                lctx.lineWidth = Math.random() * 2.5 + 1;
+                lctx.shadowBlur = 18;
+                lctx.shadowColor = lctx.strokeStyle;
+                let cx = x, cy = y;
+                lctx.moveTo(cx, cy);
+                for (let i = 0; i < 12; i++) {
+                    cx += (Math.random() - 0.5) * 50;
+                    cy += (Math.random() - 0.5) * 50;
+                    lctx.lineTo(cx, cy);
+                }
+                lctx.stroke();
+            }
+            setTimeout(() => lctx.clearRect(0, 0, lc.width, lc.height), 180);
+        }
+        window.addEventListener('mousedown', e => spark(e.clientX, e.clientY));
+        window.addEventListener('touchstart', e => { if (e.touches.length > 0) spark(e.touches[0].clientX, e.touches[0].clientY); });
+        window.addEventListener('resize', () => { lc.width = window.innerWidth; lc.height = window.innerHeight; });
+
+        // ============ HELPERS ============
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        function addLog(msg, type = 'info') {
+            const log = document.getElementById('liveLog');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const cls = type === 'warn' ? 'log-warn' : type === 'success' ? 'log-success' : 'log-info';
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="${cls}">${msg}</span>`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            if (log.children.length > 25) log.removeChild(log.firstChild);
+        }
+
+        // ============ TERMINAL POPUP ============
+        function openTerminal(header, lines, color, speed = 150) {
+            const popup = document.getElementById('terminalPopup');
+            const headerEl = document.getElementById('termHeader');
+            const content = document.getElementById('termContent');
+            headerEl.textContent = header;
+            popup.style.borderColor = color;
+            popup.style.boxShadow = `0 0 80px ${color}`;
+            headerEl.style.color = color;
+            content.style.color = color;
+            content.innerHTML = '';
+            lines.forEach((line, i) => {
+                setTimeout(() => {
+                    const p = document.createElement('p');
+                    p.textContent = line;
+                    content.appendChild(p);
+                    content.scrollTop = content.scrollHeight;
+                }, i * speed);
+            });
+            popup.classList.add('open');
+        }
+
+        function closeTerminal() { document.getElementById('terminalPopup').classList.remove('open'); }
+
+        function triggerHack() {
+            const lines = [
+                '> INITIATING HACK SEQUENCE...',
+                '> Scanning target: 203.0.113.42',
+                '> Bypassing firewall... [OK]',
+                '> Exploiting vulnerability CVE-2024...',
+                '> Accessing root shell... [OK]',
+                '> Downloading classified data...',
+                '> [████████████████] 100%',
+                '> Data extracted: 4.7 GB',
+                '> Clearing logs... [OK]',
+                '> HACK SUCCESSFUL (Simulated)',
+                '> STATUS: TARGET COMPROMISED'
+            ];
+            openTerminal('⏧ HACK SYSTEM TERMINAL', lines, '#ff2d55', 130);
+            addLog('⚠ Hack sequence initiated', 'warn');
+            showToast('🔥 HACKING IN PROGRESS...');
+        }
+
+        function triggerCrack() {
+            const lines = ['> BRUTE FORCE ENGINE STARTED', '> Target hash: SHA-256'];
+            const attempts = [
+                'Xk9mP2qL7rN3vB8w', 'Jf5hT1cW4zA9gQ2x', 'Ry6nM3pS8dF4jK7t',
+                'Lw2bV9cX5mN1qR8y', 'Ht4jG7kP2sA6dF9m', 'Qz8wC3vB5nM2xL7p',
+                'Df5jK9mN2qW8rT4y', 'Zx3cV7bN1mL5kP9q'
+            ];
+            attempts.forEach((pw, i) => lines.push(`> Attempt #${i+1}: ${pw} [FAILED - ${Math.floor(Math.random()*800+100)}ms]`));
+            const final = 'P@ssw0rd!2026#BHX';
+            lines.push(`> Attempt #9: ${final} [SUCCESS - 2341ms]`);
+            lines.push('> PASSWORD CRACKED! Access granted.');
+            openTerminal('⍝ PASSWORD CRACKER', lines, '#ff6b35', 120);
+            addLog('⚠ Brute force attack initiated', 'warn');
+            showToast('⍝ CRACKING PASSWORDS...');
+        }
+
+        function triggerEncrypt() {
+            const lines = [
+                '> AES-256-GCM ENCRYPTION ENGINE',
+                '> Initializing secure channel...',
+                '> Scanning directory: /system',
+                '> Files found: 12,847',
+                '> Encrypting /config/db.conf... [OK]',
+                '> Encrypting /data/users.db... [OK]',
+                '> Encrypting /logs/access.log... [OK]',
+                '> Encrypting /backup/full.tar.gz... [OK]',
+                '> Generating master key...',
+                '> KEY: BHX-9K4M-2P7L-Q8R3-NV62',
+                '> ALL FILES ENCRYPTED SUCCESSFULLY',
+                '> Ransom note saved: README.txt'
+            ];
+            openTerminal('⎈ FILE ENCRYPTION', lines, '#00ff88', 140);
+            addLog('⚠ Encryption engine started', 'warn');
+            showToast('🔒 ENCRYPTING FILES...');
+        }
+
+        function triggerWiFi() {
+            const networks = [
+                'TP-Link_5G_AC1200', 'Netgear_Nighthawk', 'DLink_DIR615',
+                'iPhone_ProMax', 'Samsung_Galaxy', 'Xiaomi_Redmi',
+                'ASUS_RT68U', 'Linksys_WRT3200'
+            ];
+            const lines = ['> WiFi SCANNER ACTIVATED', '> Searching for networks...'];
+            networks.forEach((net) => {
+                const sig = Math.floor(Math.random() * 40 + 60);
+                const sec = Math.random() > 0.4 ? 'WPA2' : 'WEP';
+                lines.push(`> Found: ${net} | Signal: ${sig}% | Security: ${sec}`);
+            });
+            const target = networks[Math.floor(Math.random() * networks.length)];
+            lines.push(`> TARGET SELECTED: ${target}`);
+            lines.push('> Capturing handshake... [OK]');
+            lines.push('> Brute forcing WPA2...');
+            lines.push('> Password found: iloveyou123');
+            lines.push('> CONNECTED SUCCESSFULLY!');
+            openTerminal('⎋ WiFi HACK SYSTEM', lines, '#1e90ff', 100);
+            addLog('⚠ WiFi scanner activated', 'warn');
+            showToast('⎋ SCANNING WiFi NETWORKS...');
+        }
+
+        // ============ FULLSCREEN OVERLAY ============
+        function triggerSpy() {
+            document.body.style.filter = 'brightness(0.25) contrast(2.5) saturate(0.3)';
+            document.body.style.transition = 'filter 0.8s';
+            addLog('ℹ Spy cam activated (simulated)', 'info');
+            addLog('⚠ Live feed established', 'warn');
+            showToast('⎊ SPY CAM ACTIVE!');
+            setTimeout(() => {
+                document.body.style.filter = '';
+                addLog('✓ Spy mode deactivated', 'success');
+            }, 3000);
+        }
+
+        function triggerMatrix() {
+            const canvas = document.getElementById('matrixCanvas');
+            canvas.classList.add('active');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+            const chars = 'ｦｱｳｴｵｶｷｹｹｺｻｼｽｾｿﾀﾂﾃﾅ0123456789ABCDEF';
+            const drops = Array(Math.floor(canvas.width / 18)).fill(0).map(() => Math.random() * canvas.height);
+            addLog('ℹ Matrix rain protocol active', 'success');
+            showToast('⎈ MATRIX RAIN!');
+            let interval = setInterval(() => {
+                ctx.fillStyle = 'rgba(0,0,0,0.08)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00ff41';
+                ctx.font = '16px monospace';
+                for (let i = 0; i < drops.length; i++) {
+                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 18, drops[i]);
+                    if (drops[i] > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i] += 18;
+                }
+            }, 45);
+            setTimeout(() => {
+                clearInterval(interval);
+                canvas.classList.remove('active');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                addLog('✓ Matrix mode disabled', 'success');
+            }, 5000);
+        }
+
+        function triggerNuke() {
+            const nuke = document.getElementById('nukeExplosion');
+            nuke.classList.add('active');
+            document.body.classList.add('earthquake');
+            document.body.style.backgroundColor = '#200000';
+            addLog('⚠⚠⚠ NUKE PROTOCOL ENGAGED ⚠⚠⚠', 'warn');
+            addLog('⚠ Target coordinates locked', 'warn');
+            showToast('☢️ NUKE LAUNCHED!');
+            setTimeout(() => {
+                nuke.classList.remove('active');
+                document.body.classList.remove('earthquake');
+                document.body.style.backgroundColor = '';
+                addLog('💥 IMPACT CONFIRMED (simulated)', 'warn');
+                showToast('💥 TARGET DESTROYED!');
+            }, 2000);
+        }
+
+        function triggerCertificate() {
+            document.getElementById('certificateFlip').classList.add('open');
+            addLog('ℹ Certificate retrieved', 'info');
+            showToast('⎊ CERTIFICATE OPENED!');
+        }
+
+        function closeCertificate() { document.getElementById('certificateFlip').classList.remove('open'); }
+
+        function triggerScan() {
+            const overlay = document.getElementById('radarOverlay');
+            const canvas = document.getElementById('radarCanvas');
+            overlay.classList.add('active');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const radius = Math.min(cx, cy) * 0.8;
+            let angle = 0;
+            const targets = [];
+            for (let i = 0; i < 12; i++) {
+                targets.push({
+                    x: cx + (Math.random() - 0.5) * radius * 1.5,
+                    y: cy + (Math.random() - 0.5) * radius * 1.5,
+                    size: Math.random() * 5 + 3,
+                    blink: Math.random() > 0.5
+                });
+            }
+            addLog('ℹ Radar scan initiated', 'info');
+            showToast('⎋ RADAR SCANNING...');
+            let scanInterval = setInterval(() => {
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'rgba(0,212,255,0.15)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 8; i++) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius * (i / 8), 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.moveTo(cx - radius, cy);
+                ctx.lineTo(cx + radius, cy);
+                ctx.moveTo(cx, cy - radius);
+                ctx.lineTo(cx, cy + radius);
+                ctx.stroke();
+                targets.forEach(t => {
+                    if (!t.blink || Math.random() > 0.3) {
+                        ctx.fillStyle = '#ff2d55';
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = '#ff2d55';
+                        ctx.beginPath();
+                        ctx.arc(t.x, t.y, t.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(t.x, t.y, t.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+                ctx.strokeStyle = 'rgba(0,255,136,0.7)';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = '#00ff88';
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                angle += 0.03;
+            }, 40);
+            setTimeout(() => {
+                clearInterval(scanInterval);
+                overlay.classList.remove('active');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                addLog('✓ Radar scan complete: ' + targets.length + ' targets found', 'success');
+                showToast('✅ SCAN COMPLETE!');
+            }, 4000);
+        }
+
+        function triggerDDoS() {
+            const overlay = document.getElementById('floodOverlay');
+            overlay.classList.add('active');
+            overlay.innerHTML = '';
+            addLog('⚠ Botnet activated', 'warn');
+            addLog('⚠ DDoS attack launched', 'warn');
+            showToast('💣 DDoS ATTACK!');
+            const packetInterval = setInterval(() => {
+                const packet = document.createElement('div');
+                packet.className = 'flood-packet';
+                packet.textContent = '◈ PACKET:' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                packet.style.left = Math.random() * 100 + '%';
+                packet.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                packet.style.color = ['#ff2d55', '#ff6b35', '#ffd700', '#ff4500'][Math.floor(Math.random() * 4)];
+                overlay.appendChild(packet);
+                setTimeout(() => packet.remove(), 3500);
+            }, 80);
+            setTimeout(() => {
+                clearInterval(packetInterval);
+                overlay.classList.remove('active');
+                overlay.innerHTML = '';
+                addLog('💥 Target server overloaded', 'warn');
+                showToast('💥 SERVER CRASHED!');
+            }, 4000);
+        }
+
+        // ============ CLOCK ============
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-US', {
+                timeZone: 'Asia/Dhaka', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ============ UPTIME ============
+        const startT = Date.now();
+        setInterval(() => {
+            const diff = Math.floor((Date.now() - startT) / 1000);
+            document.getElementById('trackUptime').textContent = String(Math.floor(diff / 60)).padStart(2, '0') + ':' + String(diff % 60).padStart(2, '0');
+        }, 1000);
+
+        // ============ VISITORS ============
+        let v = parseInt(localStorage.getItem('bhx_visits2') || 0) + 1;
+        localStorage.setItem('bhx_visits2', v);
+        document.getElementById('trackVisits').textContent = v;
+
+        // ============ TRACKING ============
+        async function fetchTrack() {
+            try {
+                const r = await fetch('https://ipapi.co/json/');
+                const d = await r.json();
+                document.getElementById('trackIP').textContent = d.ip || '--';
+                document.getElementById('trackLoc').textContent = (d.city || '?') + ', ' + (d.country_name || '?');
+                document.getElementById('trackISP').textContent = d.org || d.isp || '--';
+            } catch (e) {
+                document.getElementById('trackIP').textContent = 'SECURED';
+                document.getElementById('trackLoc').textContent = 'HIDDEN';
+                document.getElementById('trackISP').textContent = 'ENCRYPTED';
+            }
+            document.getElementById('trackBrowser').textContent = navigator.userAgent.includes('Mobile') ? 'MOBILE' : 'DESKTOP';
+        }
+        fetchTrack();
+
+        // ============ AUTO LOGS ============
+        setInterval(() => {
+            const msgs = ['ℹ Firewall check passed', '✓ System healthy', 'ℹ Monitoring traffic', '✓ Encryption active', 'ℹ IPS online'];
+            addLog(msgs[Math.floor(Math.random() * msgs.length)], Math.random() > 0.3 ? 'info' : 'success');
+        }, 7000);
+
+        // ============ AUDIO ============
+        function startAudio() {
+            const m = document.getElementById('bg-music');
+            if (m && m.paused) m.play().catch(() => {});
+        }
+        document.body.addEventListener('click', startAudio, { once: false });
+        document.body.addEventListener('touchstart', startAudio, { once: false });
+
+        console.log('%c⚡ MehediSaniX | Cyber Security BD ⚡', 'color:#00d4ff;font-size:22px;');
+        console.log('%c🇧🇩 হ্যাকিং কোন অপরাধ নয়, হ্যাকিং একটি শিল্প 🇧🇩', 'color:#ff2d55;font-size:14px;');
+    </script>
+</body>
+</html>
